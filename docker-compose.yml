@@ -19,10 +19,24 @@ services:
   
   user-service:
     build: ./backend/user-service
+    container_name: investquest-user-service
     ports:
       - "8080:8080"
     environment:
+      - DB_URL=jdbc:postgresql://postgres-db:5432/investquest_db
+      - DB_USER=admin
+      - DB_PASSWORD=admin
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+    depends_on:
+      - postgres-db
+    
+  frontend-ui:
+    build: ./frontend
+    container_name: investquest-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - user-service
   
 volumes:
   postgres_data:
