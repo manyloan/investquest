@@ -2,10 +2,10 @@ import { useAuth } from '../../context/AuthContext';
 
 interface HeaderProps {
     onLoginClick: () => void;
+    onRegisterClick: () => void; 
 }
 
-export default function Header({ onLoginClick }: HeaderProps) {
-    // 2. Use o hook para acessar o estado e as funções do nosso contexto.
+export default function Header({ onLoginClick, onRegisterClick }: HeaderProps) {
     const { isAuthenticated, logout } = useAuth();
 
     return (
@@ -36,7 +36,7 @@ export default function Header({ onLoginClick }: HeaderProps) {
                                     Entrar
                                 </button>
                                 <button
-                                    onClick={onLoginClick}
+                                    onClick={onRegisterClick}
                                     className="text-white bg-sky-600 hover:bg-sky-700 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                                 >
                                     Registrar

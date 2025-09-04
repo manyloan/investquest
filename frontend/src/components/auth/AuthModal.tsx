@@ -1,19 +1,26 @@
 // src/components/auth/AuthModal.tsx
-import { useState } from 'react';
 import { loginUser, registerUser } from '../../services/authService';
 import type { UserRegistrationRequest } from '../../types';
 import Modal from '../common/Modal';
 import Input from '../common/Input';
 import { useAuth } from '../../context/AuthContext';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthModalProps {
     isOpen: boolean;
     onClose: () => void;
+    initialView?: 'LOGIN' | 'REGISTER';
 }
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-    const { login } = useAuth();
+export default function AuthModal({ isOpen, onClose, initialView = 'LOGIN' }: AuthModalProps) {
     const [isLoginView, setIsLoginView] = useState(true);
+    const { login } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setIsLoginView(initialView === 'LOGIN');
+    }, [initialView, isOpen]);
     
 
     // Estados para os campos do formulário
@@ -49,12 +56,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         try {
             const response = await loginUser({ email, password });
-            const token = response.data.token;
-
-            login(token);
-
-            alert(`Login bem-sucedido!`);
-            onClose(); // Fecha o modal após o sucesso.
+            login(response.data.token);
+            onClose();
+            navigate('/dashboard'); // REDIRECIONA AQUI!
         } catch (err: any) {
             setError(err.response?.data?.message || 'Email ou senha inválidos.');
         } finally {

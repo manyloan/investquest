@@ -1,30 +1,43 @@
 // src/App.tsx
 import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import AuthModal from "./components/auth/AuthModal";
 import Header from "./components/layout/Header";
+import LandingPage from "./pages/LandingPage";
+import DashboardPage from "./pages/DashboardPage";
+import ProtectedRoute from "./components/common/ProtectedRoute";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
-  // Estado para controlar se o modal está aberto ou fechado
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [initialView, setInitialView] = useState<'LOGIN' | 'REGISTER'>('LOGIN');
+  const { isAuthenticated } = useAuth();
 
-  const handleOpenAuthModal = () => {
+  const openModal = (view: 'LOGIN' | 'REGISTER') => {
+    setInitialView(view);
     setIsAuthModalOpen(true);
   };
 
   return (
-    // Container principal da nossa aplicação
     <div className="bg-slate-900 min-h-screen text-white">
+      <Header onLoginClick={() => openModal('LOGIN')} onRegisterClick={() => openModal('REGISTER')} />
 
-      <Header onLoginClick={handleOpenAuthModal} /> 
-
-      <main className="container mx-auto text-center pt-20">
-        <h1 className="text-5xl font-bold text-sky-400">InvestQuest</h1>
-        <p className="mt-2 text-lg text-slate-300">Sua jornada gamificada no mundo dos investimentos.</p>
-      </main>
+      <Routes>
+        <Route path="/" element={!isAuthenticated ? <LandingPage onRegisterClick={() => openModal('REGISTER')} /> : <Navigate to="/dashboard" />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
 
       <AuthModal 
         isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+        onClose={() => setIsAuthModalOpen(false)}
+        initialView={initialView}
       />
     </div>
   )
