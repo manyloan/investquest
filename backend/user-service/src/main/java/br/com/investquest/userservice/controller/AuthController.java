@@ -4,7 +4,7 @@ import br.com.investquest.userservice.dto.AuthenticationRequest;
 import br.com.investquest.userservice.dto.AuthenticationResponse;
 import br.com.investquest.userservice.dto.UserRegistrationRequest;
 import br.com.investquest.userservice.model.User;
-import br.com.investquest.userservice.service.AuthenticationService; // MUDANÇA AQUI
+import br.com.investquest.userservice.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthenticationService authenticationService; // MUDANÇA AQUI
+    private final AuthenticationService authenticationService;
 
     @Autowired
-    public AuthController(AuthenticationService authenticationService) { // MUDANÇA AQUI
+    public AuthController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 
@@ -28,13 +28,12 @@ public class AuthController {
         newUser.setEmail(registrationRequest.email());
         newUser.setPassword(registrationRequest.password());
 
-        User savedUser = authenticationService.createUser(newUser); // MUDANÇA AQUI
+        User savedUser = authenticationService.createUser(newUser);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
-    // Endpoint de Login que vamos criar a seguir
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(authenticationService.authenticate(request)); // MUDANÇA AQUI
+        return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 }

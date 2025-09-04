@@ -2,6 +2,7 @@ package br.com.investquest.userservice.service;
 
 import br.com.investquest.userservice.dto.AuthenticationRequest;
 import br.com.investquest.userservice.dto.AuthenticationResponse;
+import br.com.investquest.userservice.model.Portfolio;
 import br.com.investquest.userservice.model.User;
 import br.com.investquest.userservice.repository.UserRepository;
 import br.com.investquest.userservice.security.JwtService;
@@ -10,6 +11,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 public class AuthenticationService {
@@ -30,6 +33,13 @@ public class AuthenticationService {
     public User createUser(User user) {
         String hashedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(hashedPassword);
+
+        Portfolio newPortfolio = new Portfolio();
+        newPortfolio.setVirtualCashBalance(new BigDecimal("100000.00"));
+        newPortfolio.setUser(user);
+
+        user.setPortfolio(newPortfolio); // Associando o usuario ao portfolio
+
         return userRepository.save(user);
     }
 
