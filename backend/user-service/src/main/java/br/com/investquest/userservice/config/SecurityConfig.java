@@ -16,25 +16,46 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import java.util.List;
 
+import br.com.investquest.userservice.security.JwtAuthenticationFilter;
+import br.com.investquest.userservice.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final UserService userService;
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 4. Desabilita o CSRF, uma proteção que não é necessária para nossa API stateless.
             .csrf(csrf -> csrf.disable())
             .cors(withDefaults())
-            // 5. Define as regras de autorização para as requisições HTTP.
             .authorizeHttpRequests(auth -> auth
-                // 6. Permite que QUALQUER UM acesse as URLs que começam com /api/auth/
                 .requestMatchers("/api/auth/**").permitAll()
-                // 7. Exige autenticação para QUALQUER OUTRA requisição.
                 .anyRequest().authenticated()
-            );
+            )
+            // 1. Define a política de sessão como STATELESS (sem estado)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // 2. Define nosso provedor de autenticação (ver método abaixo)
+            .authenticationProvider(authenticationProvider())
+            // 3. Adiciona nosso filtro JWT ANTES do filtro padrão de username/password
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build(); // Constrói e retorna a cadeia de filtros de segurança.
+        return http.build();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
     }
 
     @Bean
