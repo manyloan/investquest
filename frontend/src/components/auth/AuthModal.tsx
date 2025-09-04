@@ -4,6 +4,7 @@ import { loginUser, registerUser } from '../../services/authService';
 import type { UserRegistrationRequest } from '../../types';
 import Modal from '../common/Modal';
 import Input from '../common/Input';
+import { useAuth } from '../../context/AuthContext';
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -11,8 +12,9 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-    // Estado para controlar qual view mostrar: LOGIN ou REGISTER
+    const { login } = useAuth();
     const [isLoginView, setIsLoginView] = useState(true);
+    
 
     // Estados para os campos do formulário
     const [email, setEmail] = useState('');
@@ -44,15 +46,15 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setError(null);
 
         try {
             const response = await loginUser({ email, password });
             const token = response.data.token;
-            console.log('Login bem-sucedido! Token:', token);
+
+            login(token);
+
             alert(`Login bem-sucedido!`);
-            // Futuramente, vamos salvar o token e fechar o modal
-            onClose();
+            onClose(); // Fecha o modal após o sucesso.
         } catch (err: any) {
             setError(err.response?.data?.message || 'Email ou senha inválidos.');
         } finally {
