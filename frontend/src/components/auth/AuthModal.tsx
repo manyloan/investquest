@@ -56,9 +56,10 @@ export default function AuthModal({ isOpen, onClose, initialView = 'LOGIN' }: Au
 
         try {
             const response = await loginUser({ email, password });
-            login(response.data.token);
+            const token = response.data.token;
+            login(token);
             onClose();
-            navigate('/dashboard'); // REDIRECIONA AQUI!
+            navigate('/dashboard');
         } catch (err: any) {
             setError(err.response?.data?.message || 'Email ou senha inválidos.');
         } finally {

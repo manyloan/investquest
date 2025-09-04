@@ -17,3 +17,8 @@ export interface AuthenticationRequest {
 export interface AuthenticationResponse {
     token: string;
 }
+
+export interface Portfolio {
+    id: number;
+    virtualCashBalance: number;
+}

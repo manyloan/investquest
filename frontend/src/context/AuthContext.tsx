@@ -1,5 +1,6 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect  } from 'react';
 import type { ReactNode } from 'react';
+import { setAuthToken } from '../services/api';
 
 
 interface AuthContextType {
@@ -14,6 +15,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [token, setToken] = useState<string | null>(null);
 
+    useEffect(() => {
+        setAuthToken(token);
+    }, [token])
+
     const login = (newToken: string) => {
         setToken(newToken);
         // Futuramente, aqui também salvaremos dados do usuário, se quisermos.
@@ -22,6 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const logout = () => {
         setToken(null);
         // Limpa qualquer outra informação de usuário que tivermos
+        localStorage.removeItem('authToken');
     };
 
     const value = {
